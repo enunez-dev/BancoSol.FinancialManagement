@@ -14,10 +14,11 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        var hexaRateOptions = configuration.GetSection(HexaRateOptions.SectionName).Get<HexaRateOptions>() ?? new HexaRateOptions();
         var rawConnectionString = configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("The DefaultConnection string was not found.");
         var parsedConnectionString = ConnectionStringParser.Parse(rawConnectionString);
+
+        services.Configure<HexaRateOptions>(configuration.GetSection(HexaRateOptions.SectionName));
 
         services.AddDbContext<FinancialManagementDbContext>(options =>
         {
@@ -28,7 +29,6 @@ public static class DependencyInjection
 
         services.AddHttpClient<IExchangeRateProvider, HexaRateExchangeRateProvider>(httpClient =>
         {
-            httpClient.BaseAddress = new Uri(hexaRateOptions.BaseUrl);
             httpClient.DefaultRequestHeaders.Accept.Clear();
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/plain"));

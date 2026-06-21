@@ -3,30 +3,39 @@ using System.Text.Json.Serialization;
 using Application.Abstractions;
 using Domain.ValueObjects;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Infrastructure.ExchangeRates;
 
-// Implementa el puerto de aplicaciÃ³n consumiendo la API externa de HexaRate y registra trazas Ãºtiles para diagnosticar fallos en producciÃ³n.
+// Implementa el puerto de aplicación consumiendo la API externa de HexaRate y registra trazas útiles para diagnosticar fallos en producción.
 public sealed class HexaRateExchangeRateProvider : IExchangeRateProvider
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<HexaRateExchangeRateProvider> _logger;
+    private readonly HexaRateOptions _options;
 
-    public HexaRateExchangeRateProvider(HttpClient httpClient, ILogger<HexaRateExchangeRateProvider> logger)
+    public HexaRateExchangeRateProvider(
+        HttpClient httpClient,
+        IOptions<HexaRateOptions> options,
+        ILogger<HexaRateExchangeRateProvider> logger)
     {
         _httpClient = httpClient;
         _logger = logger;
+        _options = options.Value;
     }
 
     public async Task<ExchangeRate> GetUsdToBobExchangeRateAsync(CancellationToken cancellationToken)
     {
-        const string endpoint = "api/rates/USD/BOB/latest";
+        if (string.IsNullOrWhiteSpace(_options.UsdBobLatestUrl))
+        {
+            throw new InvalidOperationException("The HexaRate USD/BOB latest URL was not configured.");
+        }
 
         try
         {
-            _logger.LogInformation("Requesting USD/BOB exchange rate from provider. BaseAddress: {BaseAddress}, Endpoint: {Endpoint}", _httpClient.BaseAddress, endpoint);
+            _logger.LogInformation("Requesting USD/BOB exchange rate from provider. Url: {Url}", _options.UsdBobLatestUrl);
 
-            using var httpResponse = await _httpClient.GetAsync(endpoint, cancellationToken);
+            using var httpResponse = await _httpClient.GetAsync(_options.UsdBobLatestUrl, cancellationToken);
             var responseContent = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
 
             _logger.LogInformation("Exchange rate provider responded with status code {StatusCode}. Body: {Body}", (int)httpResponse.StatusCode, responseContent);
@@ -67,7 +76,7 @@ public sealed class HexaRateExchangeRateProvider : IExchangeRateProvider
         public HexaRateData? Data { get; init; }
     }
 
-    // Contiene la estructura especÃ­fica del nodo de datos devuelto por el proveedor externo.
+    // Contiene la estructura específica del nodo de datos devuelto por el proveedor externo.
     private sealed class HexaRateData
     {
         [JsonPropertyName("base")]

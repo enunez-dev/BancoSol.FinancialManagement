@@ -1,9 +1,9 @@
 namespace Infrastructure.ExchangeRates;
 
-// Modela la configuraciÃ³n necesaria para conectarse con el proveedor externo HexaRate.
+// Modela la configuración necesaria para conectarse con el proveedor externo HexaRate usando una URL completa configurable por entorno.
 public sealed class HexaRateOptions
 {
     public const string SectionName = "HexaRate";
 
-    public string BaseUrl { get; set; } = "https://hexarate.paikama.co/";
+    public string UsdBobLatestUrl { get; set; } = string.Empty;
 }
