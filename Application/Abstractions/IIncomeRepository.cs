@@ -1,3 +1,4 @@
+using Application.Queries;
 using Domain.Entities;
 
 namespace Application.Abstractions;
@@ -6,4 +7,5 @@ namespace Application.Abstractions;
 public interface IIncomeRepository
 {
     Task AddAsync(Income income, CancellationToken cancellationToken);
+    Task<(IReadOnlyCollection<Income> Items, int TotalItems)> GetHistoryAsync(IncomeHistoryQuery query, CancellationToken cancellationToken);
 }

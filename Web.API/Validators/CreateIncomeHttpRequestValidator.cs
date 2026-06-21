@@ -33,8 +33,6 @@ public sealed class CreateIncomeHttpRequestValidator : AbstractValidator<CreateI
         RuleFor(request => request.Currency)
             .NotEmpty()
             .WithMessage("La moneda es obligatoria.")
-            .Length(3)
-            .WithMessage("La moneda debe tener exactamente 3 caracteres.")
             .Must(currency => SupportedCurrencies.Contains((currency ?? string.Empty).Trim().ToUpperInvariant()))
             .WithMessage("La moneda solo puede ser BOB o USD.");
     }
