@@ -4,7 +4,9 @@ trigger:
       - develop
 
 pool:
-  vmImage: 'windows-latest'
+  name: 'SelfHosted-Windows'
+  demands:
+    - Agent.Name -equals EDWARD-WINDOWS-AGENT
 
 variables:
   buildConfiguration: 'Release'
@@ -69,6 +71,10 @@ stages:
     jobs:
       - job: DeployWebApi
         displayName: 'Deploy Web API'
+        pool:
+          name: 'SelfHosted-Windows'
+          demands:
+            - Agent.Name -equals EDWARD-WINDOWS-AGENT
         steps:
           - download: current
             artifact: drop
