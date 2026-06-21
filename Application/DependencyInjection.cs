@@ -1,4 +1,5 @@
 using Application.UseCases.CreateIncome;
+using Application.UseCases.GetConsolidatedBalance;
 using Application.UseCases.GetIncomeHistory;
 using Application.UseCases.GetUsdToBobExchangeRate;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +14,7 @@ public static class DependencyInjection
         services.AddScoped<GetUsdToBobExchangeRateUseCase>();
         services.AddScoped<CreateIncomeUseCase>();
         services.AddScoped<GetIncomeHistoryUseCase>();
+        services.AddScoped<GetConsolidatedBalanceUseCase>();
 
         return services;
     }

@@ -52,4 +52,14 @@ public sealed class IncomeRepository : IIncomeRepository
 
         return (items, totalItems);
     }
+
+    public async Task<IReadOnlyCollection<Income>> GetByDateRangeAsync(DateOnly startDate, DateOnly endDate, CancellationToken cancellationToken)
+    {
+        return await _dbContext.Incomes
+            .AsNoTracking()
+            .Where(income => income.ReceivedOn >= startDate && income.ReceivedOn <= endDate)
+            .OrderBy(income => income.ReceivedOn)
+            .ThenBy(income => income.Id)
+            .ToListAsync(cancellationToken);
+    }
 }
