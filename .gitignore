@@ -1,0 +1,46 @@
+# Build output by project/layer
+bin/
+obj/
+out/
+publish/
+artifacts/
+
+# Visual Studio / Rider / VS Code
+.vs/
+.idea/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.rsuser
+
+# Test and coverage output
+TestResults/
+coverage/
+coverage-results/
+*.coverage
+*.coveragexml
+*.trx
+
+# Logs
+*.log
+logs/
+
+# NuGet
+packages/
+*.nupkg
+*.snupkg
+
+# Local environment files
+.env
+.env.*
+
+# Local databases and runtime files
+*.db
+*.db-shm
+*.db-wal
+
+# OS files
+Thumbs.db
+Desktop.ini
