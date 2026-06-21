@@ -1,17 +1,30 @@
 using System.Net.Http.Headers;
 using Application.Abstractions;
 using Infrastructure.ExchangeRates;
+using Infrastructure.Persistence;
+using Infrastructure.Persistence.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure;
 
-// Registra los adaptadores de infraestructura que satisfacen los puertos definidos por la capa de aplicación.
+// Registra los adaptadores de infraestructura tanto para APIs externas como para persistencia en PostgreSQL usando EF Core.
 public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         var hexaRateOptions = configuration.GetSection(HexaRateOptions.SectionName).Get<HexaRateOptions>() ?? new HexaRateOptions();
+        var rawConnectionString = configuration.GetConnectionString("DefaultConnection")
+            ?? throw new InvalidOperationException("The DefaultConnection string was not found.");
+        var parsedConnectionString = ConnectionStringParser.Parse(rawConnectionString);
+
+        services.AddDbContext<FinancialManagementDbContext>(options =>
+        {
+            options.UseNpgsql(parsedConnectionString);
+        });
+
+        services.AddScoped<IIncomeRepository, IncomeRepository>();
 
         services.AddHttpClient<IExchangeRateProvider, HexaRateExchangeRateProvider>(httpClient =>
         {
