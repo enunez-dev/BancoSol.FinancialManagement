@@ -4,9 +4,7 @@ trigger:
       - develop
 
 pool:
-  name: 'SelfHosted-Windows'
-  demands:
-    - Agent.Name -equals EDWARD-WINDOWS-AGENT
+  vmImage: 'windows-latest'
 
 variables:
   buildConfiguration: 'Release'
@@ -43,13 +41,21 @@ stages:
               projects: '**/*.csproj'
               arguments: '--configuration $(buildConfiguration) --no-restore'
 
-          # - task: DotNetCoreCLI@2
-          #   displayName: 'Run tests'
-          #   inputs:
-          #     command: 'test'
-          #     projects: '**/*Tests.csproj'
-          #     arguments: '--configuration $(buildConfiguration) --no-build'
-          #   continueOnError: false
+          - task: DotNetCoreCLI@2
+            displayName: 'Run tests'
+            inputs:
+              command: 'test'
+              projects: '**/*Tests.csproj'
+              arguments: '--configuration $(buildConfiguration) --no-build --collect:"XPlat Code Coverage"'
+              publishTestResults: true
+              testRunTitle: 'Unit Tests'
+            continueOnError: false
+
+          - task: PublishCodeCoverageResults@2
+            displayName: 'Publish code coverage'
+            inputs:
+              summaryFileLocation: '$(Agent.TempDirectory)/**/coverage.cobertura.xml'
+              failIfCoverageEmpty: true
 
           - task: DotNetCoreCLI@2
             displayName: 'Publish API'
@@ -71,10 +77,6 @@ stages:
     jobs:
       - job: DeployWebApi
         displayName: 'Deploy Web API'
-        pool:
-          name: 'SelfHosted-Windows'
-          demands:
-            - Agent.Name -equals EDWARD-WINDOWS-AGENT
         steps:
           - download: current
             artifact: drop

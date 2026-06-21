@@ -44,3 +44,9 @@ packages/
 # OS files
 Thumbs.db
 Desktop.ini
+
+CoverageReport/
+TestResults/
+coverage/
+*.coverage
+*.coveragexml

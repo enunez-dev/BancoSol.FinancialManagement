@@ -3,4 +3,5 @@
   <Project Path="Domain/Domain.csproj" />
   <Project Path="Infrastructure/Infrastructure.csproj" />
   <Project Path="Web.API/Web.API.csproj" />
+  <Project Path="Tests/BancoSol.FinancialManagement.Tests.csproj" />
 </Solution>
