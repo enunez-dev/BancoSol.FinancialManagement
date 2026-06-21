@@ -12,6 +12,22 @@ namespace Tests;
 public sealed class GetConsolidatedBalanceUseCaseTests
 {
     [Fact]
+    public async Task ExecuteAsync_DebeFallarSiElRangoDeFechasEsInvalido()
+    {
+        var incomeRepositoryMock = new Mock<IIncomeRepository>();
+        var exchangeRateProviderMock = new Mock<IExchangeRateProvider>();
+        var useCase = new GetConsolidatedBalanceUseCase(incomeRepositoryMock.Object, exchangeRateProviderMock.Object);
+
+        var exception = await Assert.ThrowsAsync<ArgumentException>(() => useCase.ExecuteAsync(new GetConsolidatedBalanceRequest
+        {
+            StartDate = new DateOnly(2026, 6, 30),
+            EndDate = new DateOnly(2026, 6, 1),
+            Currency = "BOB"
+        }, CancellationToken.None));
+
+        Assert.Equal("La fecha inicial no puede ser mayor que la fecha final.", exception.Message);
+    }
+    [Fact]
     public async Task ExecuteAsync_DebeCalcularBalanceEnBob()
     {
         var incomes = new List<Income>
