@@ -3,6 +3,9 @@ using Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.AddConsole();
+builder.Logging.AddAzureWebAppDiagnostics();
+
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
