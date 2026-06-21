@@ -67,20 +67,16 @@ stages:
     dependsOn: BuildAndTest
     condition: succeeded()
     jobs:
-      - deployment: DeployWebApi
+      - job: DeployWebApi
         displayName: 'Deploy Web API'
-        environment: 'production'
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - download: current
-                  artifact: drop
+        steps:
+          - download: current
+            artifact: drop
 
-                - task: AzureWebApp@1
-                  displayName: 'Deploy to Azure App Service'
-                  inputs:
-                    azureSubscription: '$(azureSubscription)'
-                    appType: 'webApp'
-                    appName: '$(webAppName)'
-                    package: '$(Pipeline.Workspace)/drop/**/*.zip'
+          - task: AzureWebApp@1
+            displayName: 'Deploy to Azure App Service'
+            inputs:
+              azureSubscription: '$(azureSubscription)'
+              appType: 'webApp'
+              appName: '$(webAppName)'
+              package: '$(Pipeline.Workspace)/drop/**/*.zip'
