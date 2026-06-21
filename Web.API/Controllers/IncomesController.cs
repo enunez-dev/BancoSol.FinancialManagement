@@ -7,7 +7,9 @@ using Web.API.Models;
 
 namespace Web.API.Controllers;
 
-// Expone los casos de uso de ingresos mediante HTTP y mantiene el controlador enfocado en responsabilidades de transporte.
+/// <summary>
+/// Expone los casos de uso de ingresos mediante HTTP y mantiene el controlador enfocado en responsabilidades de transporte.
+/// </summary>
 [ApiController]
 [Route("api/incomes")]
 public sealed class IncomesController : ControllerBase
@@ -21,6 +23,21 @@ public sealed class IncomesController : ControllerBase
         _getIncomeHistoryUseCase = getIncomeHistoryUseCase;
     }
 
+    /// <summary>
+    /// Registra un nuevo ingreso.
+    /// </summary>
+    /// <remarks>
+    /// Ejemplo de request:
+    ///
+    ///     POST /api/incomes
+    ///     {
+    ///       "amount": 1500.75,
+    ///       "description": "Pago de salario",
+    ///       "receivedOn": "2026-06-21",
+    ///       "source": "Empresa XYZ",
+    ///       "currency": "BOB"
+    ///     }
+    /// </remarks>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -38,6 +55,18 @@ public sealed class IncomesController : ControllerBase
         return CreatedAtAction(nameof(Create), new { id = response.Id }, response);
     }
 
+    /// <summary>
+    /// Consulta el historial de ingresos con soporte de filtros y paginación.
+    /// </summary>
+    /// <remarks>
+    /// Ejemplo de consulta paginada:
+    ///
+    ///     GET /api/incomes?page=1&amp;itemsPage=10&amp;startDate=2026-06-01&amp;endDate=2026-06-30&amp;fetchAll=0
+    ///
+    /// Ejemplo para traer todo:
+    ///
+    ///     GET /api/incomes?fetchAll=1
+    /// </remarks>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

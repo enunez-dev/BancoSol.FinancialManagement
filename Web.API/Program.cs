@@ -1,3 +1,4 @@
+using System.Reflection;
 using FluentValidation;
 using Application;
 using FluentValidation.AspNetCore;
@@ -25,13 +26,13 @@ builder.Services
                 .SelectMany(entry => entry.Value!.Errors.Select(error => new ValidationErrorDetailResponse
                 {
                     Field = entry.Key,
-                    Message = string.IsNullOrWhiteSpace(error.ErrorMessage) ? "El valor enviado no es vÃ¡lido." : error.ErrorMessage
+                    Message = string.IsNullOrWhiteSpace(error.ErrorMessage) ? "El valor enviado no es válido." : error.ErrorMessage
                 }))
                 .ToArray();
 
             var response = new ValidationErrorResponse
             {
-                Message = "La solicitud contiene errores de validaciÃ³n.",
+                Message = "La solicitud contiene errores de validación.",
                 Errors = errors
             };
 
@@ -46,7 +47,16 @@ builder.Services.AddFluentValidationAutoValidation(configuration =>
 builder.Services.AddValidatorsFromAssemblyContaining<CreateIncomeHttpRequestValidator>();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+    if (File.Exists(xmlPath))
+    {
+        options.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
+    }
+});
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 

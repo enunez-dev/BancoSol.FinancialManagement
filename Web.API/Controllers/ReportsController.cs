@@ -5,7 +5,9 @@ using Web.API.Models;
 
 namespace Web.API.Controllers;
 
-// Expone el caso de uso de reporte consolidado mediante HTTP y mantiene el controlador centrado en la traducci√≥n de par√°metros.
+/// <summary>
+/// Expone el caso de uso de reporte consolidado mediante HTTP y mantiene el controlador centrado en la traducciÛn de par·metros.
+/// </summary>
 [ApiController]
 [Route("api/reports")]
 public sealed class ReportsController : ControllerBase
@@ -17,6 +19,14 @@ public sealed class ReportsController : ControllerBase
         _getConsolidatedBalanceUseCase = getConsolidatedBalanceUseCase;
     }
 
+    /// <summary>
+    /// Obtiene el balance consolidado de ingresos en la moneda solicitada.
+    /// </summary>
+    /// <remarks>
+    /// Ejemplo de consulta:
+    ///
+    ///     GET /api/reports/consolidated-balance?startDate=2026-06-01&amp;endDate=2026-06-30&amp;currency=BOB
+    /// </remarks>
     [HttpGet("consolidated-balance")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

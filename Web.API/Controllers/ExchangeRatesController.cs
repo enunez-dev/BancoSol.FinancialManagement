@@ -4,7 +4,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Web.API.Controllers;
 
-// Expone el caso de uso de consulta de tipo de cambio mediante un endpoint HTTP y registra trazas de entrada y salida para soporte operativo.
+/// <summary>
+/// Expone el caso de uso de consulta de tipo de cambio mediante un endpoint HTTP y registra trazas de entrada y salida para soporte operativo.
+/// </summary>
 [ApiController]
 [Route("api/exchange-rates")]
 public sealed class ExchangeRatesController : ControllerBase
@@ -20,6 +22,14 @@ public sealed class ExchangeRatesController : ControllerBase
         _logger = logger;
     }
 
+    /// <summary>
+    /// Consulta el tipo de cambio actual entre USD y BOB.
+    /// </summary>
+    /// <remarks>
+    /// Ejemplo de consulta:
+    ///
+    ///     GET /api/exchange-rates/usd-bob
+    /// </remarks>
     [HttpGet("usd-bob")]
     public async Task<IActionResult> GetUsdToBob(CancellationToken cancellationToken)
     {
