@@ -1,0 +1,2 @@
+# BancoSol.FinancialManagement
+Prueba tecnica
