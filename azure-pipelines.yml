@@ -1,0 +1,86 @@
+trigger:
+  branches:
+    include:
+      - develop
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  buildConfiguration: 'Release'
+  dotnetVersion: '10.x'
+  azureSubscription: 'sc-azure-bancosol'
+  webAppName: 'app-bancosol-personalfinance'
+  apiProject: 'Web.API/Web.API.csproj'
+
+stages:
+  - stage: BuildAndTest
+    displayName: 'Build and Test'
+    jobs:
+      - job: Build
+        displayName: 'Build .NET API'
+        steps:
+          - checkout: self
+
+          - task: UseDotNet@2
+            displayName: 'Install .NET SDK'
+            inputs:
+              packageType: 'sdk'
+              version: '$(dotnetVersion)'
+
+          - task: DotNetCoreCLI@2
+            displayName: 'Restore dependencies'
+            inputs:
+              command: 'restore'
+              projects: '**/*.csproj'
+
+          - task: DotNetCoreCLI@2
+            displayName: 'Build solution'
+            inputs:
+              command: 'build'
+              projects: '**/*.csproj'
+              arguments: '--configuration $(buildConfiguration) --no-restore'
+
+          # - task: DotNetCoreCLI@2
+          #   displayName: 'Run tests'
+          #   inputs:
+          #     command: 'test'
+          #     projects: '**/*Tests.csproj'
+          #     arguments: '--configuration $(buildConfiguration) --no-build'
+          #   continueOnError: false
+
+          - task: DotNetCoreCLI@2
+            displayName: 'Publish API'
+            inputs:
+              command: 'publish'
+              publishWebProjects: false
+              projects: '$(apiProject)'
+              arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/publish'
+              zipAfterPublish: true
+
+          - publish: '$(Build.ArtifactStagingDirectory)/publish'
+            displayName: 'Publish artifact'
+            artifact: 'drop'
+
+  - stage: Deploy
+    displayName: 'Deploy to Azure App Service'
+    dependsOn: BuildAndTest
+    condition: succeeded()
+    jobs:
+      - deployment: DeployWebApi
+        displayName: 'Deploy Web API'
+        environment: 'production'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: current
+                  artifact: drop
+
+                - task: AzureWebApp@1
+                  displayName: 'Deploy to Azure App Service'
+                  inputs:
+                    azureSubscription: '$(azureSubscription)'
+                    appType: 'webApp'
+                    appName: '$(webAppName)'
+                    package: '$(Pipeline.Workspace)/drop/**/*.zip'
